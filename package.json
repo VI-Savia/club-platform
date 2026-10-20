@@ -1,0 +1,10 @@
+{
+  "name": "club-platform",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node backend/server.js",
+    "test": "node --test",
+    "lint": "node --check backend/app.js && node --check backend/store.js && node --check backend/server.js"
+  }
+}
