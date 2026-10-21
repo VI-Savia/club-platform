@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Клуби за інтересами</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+    .club { border: 1px solid #ccc; border-radius: 8px; padding: .75rem 1rem; margin: .75rem 0; }
+    .club h3 { margin: 0 0 .25rem; }
+    .meta { color: #666; font-size: .9rem; }
+    input, select { padding: .4rem; margin-right: .5rem; }
+  </style>
+</head>
+<body>
+  <h1>Клуби за інтересами</h1>
+  <div>
+    <input id="q" placeholder="Пошук за назвою">
+    <select id="category"><option value="">Усі категорії</option></select>
+  </div>
+  <div id="list"></div>
+
+  <script>
+    const list = document.getElementById('list');
+    const q = document.getElementById('q');
+    const category = document.getElementById('category');
+
+    async function loadCategories() {
+      const items = await (await fetch('/api/categories')).json();
+      for (const c of items) category.add(new Option(c, c));
+    }
+
+    async function loadClubs() {
+      const params = new URLSearchParams({ q: q.value, category: category.value });
+      const clubs = await (await fetch('/api/clubs?' + params)).json();
+      list.innerHTML = '';
+      if (!clubs.length) { list.textContent = 'Нічого не знайдено'; return; }
+      for (const c of clubs) {
+        const div = document.createElement('div');
+        div.className = 'club';
+        div.innerHTML = `<h3></h3><div class="meta"></div><p></p>`;
+        div.querySelector('h3').textContent = c.name;
+        div.querySelector('.meta').textContent = `${c.category} · ${c.city} · учасників: ${c.members_count}`;
+        div.querySelector('p').textContent = c.description;
+        list.appendChild(div);
+      }
+    }
+
+    q.addEventListener('input', loadClubs);
+    category.addEventListener('change', loadClubs);
+    loadCategories().then(loadClubs);
+  </script>
+</body>
+</html>
